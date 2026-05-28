@@ -42,10 +42,10 @@ const getReputationLevel = (score) => {
 };
 
 const COLORS = {
-  Clean: '#4CAF50',
-  Good: '#2196F3',
-  Medium: '#FFC107',
-  High: '#F44336',
+  Clean: '#C9E4DE',
+  Good: '#C6DEF1',
+  Medium: '#FAEDCB',
+  High: '#F2C6DE',
 };
 
 const RADIAN = Math.PI / 180;
@@ -94,7 +94,6 @@ const Dashboard = ({ data, entityName, selectedServerNames, viewType }) => {
     const handleChartClick = (data) => {
         if (viewType !== 'entity' || !data) return;
 
-        // If 'payload' property exists, it's from recharts, otherwise it's from our custom calls.
         const payload = data.payload ? data.payload : data;
         
         if(!payload) return;
@@ -359,7 +358,7 @@ const Dashboard = ({ data, entityName, selectedServerNames, viewType }) => {
                                     <ListItem key={server.name} button onClick={() => handleChartClick({ name: chartFilter.level, server: server.name })}>
                                         <ListItemText 
                                             primary={server.name} 
-                                            secondary={dynamicServerList.isBlacklist ? `${server.percentage}% of IPs` : `${server.count} IPs`} 
+                                            secondary={`${server.count} IPs (${server.percentage}%)`} 
                                         />
                                     </ListItem>
                                 ))}
