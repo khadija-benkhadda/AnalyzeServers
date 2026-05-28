@@ -1,66 +1,75 @@
-
 import { createTheme } from '@mui/material/styles';
 
-// A custom theme for this app
-const theme = createTheme({
+// A modern, dark, glassmorphism theme for our application
+export const darkTheme = createTheme({
   palette: {
-    mode: 'light',
+    mode: 'dark',
     primary: {
-      main: '#1976d2', // A classic, professional blue
+      main: '#BB86FC', // A vibrant purple
+    },
+    secondary: {
+      main: '#03DAC6', // A teal accent
     },
     background: {
-      default: '#f4f6f8', // A very light, clean grey
-      paper: '#ffffff',   // Plain white for cards and surfaces
+      default: '#121212', // A deep, dark background
+      paper: 'rgba(255, 255, 255, 0.08)', // Translucent paper for the glass effect
     },
     text: {
-      primary: '#172b4d',   // Dark, high-contrast text
-      secondary: '#6b778c', // Lighter grey for secondary info
+      primary: '#E0E0E0',
+      secondary: '#BDBDBD',
     },
   },
   typography: {
-    fontFamily: '"Inter", "Helvetica", "Arial", sans-serif',
-    h4: {
-      fontWeight: 700,
-      color: '#172b4d',
-    },
+    fontFamily: '"Inter", "Roboto", "Helvetica", "Arial", sans-serif',
     h5: {
+      fontWeight: 700,
+    },
+    h6: {
       fontWeight: 600,
-      color: '#2a3eb1',
     },
   },
   components: {
+    // The core of the glassmorphism effect
     MuiPaper: {
       styleOverrides: {
         root: {
-          borderRadius: 8,
-          boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.05)', // A more subtle shadow
+          backdropFilter: 'blur(12px)',
+          border: '1px solid rgba(255, 255, 255, 0.1)',
+          borderRadius: '12px',
+          boxShadow: '0 8px 32px 0 rgba(0, 0, 0, 0.37)',
         },
       },
     },
+    // Glowing buttons
     MuiButton: {
-      styleOverrides: {
-        root: {
-          borderRadius: 8,
-          textTransform: 'none',
-          fontWeight: 600,
-        },
-      },
+        styleOverrides: {
+            contained: {
+                boxShadow: '0 0 10px rgba(187, 134, 252, 0.5)',
+                '&:hover': {
+                    boxShadow: '0 0 18px rgba(187, 134, 252, 0.8)',
+                }
+            },
+            outlined: {
+                 border: '1px solid rgba(187, 134, 252, 0.5)',
+            }
+        }
     },
-    MuiTableHead: {
+    // Style for chart containers and other key elements
+    MuiCard: {
         styleOverrides: {
             root: {
-                backgroundColor: '#f4f6f8',
+                backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                backdropFilter: 'blur(10px)',
             }
         }
     },
     MuiTableCell: {
         styleOverrides: {
-            root: {
-                borderBottom: '1px solid rgba(0, 0, 0, 0.12)',
+            head: {
+                color: '#BB86FC',
+                fontWeight: 'bold',
             }
         }
     }
   },
 });
-
-export default theme;

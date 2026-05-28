@@ -19,6 +19,10 @@ This application provides a focused solution for analyzing IP reputation scores 
     - **Blacklist Highlighting:** In the table, any IP that is blacklisted (`Detected on blacklist: Blacklisted`) is highlighted in red for immediate visual attention.
 - **Reputation Levels:** The reputation score is categorized as "Clean" (0), "Good" (1-39), "Medium" (40-69), or "High" (70-100) for immediate assessment.
 - **Data Enrichment:** The application can now handle more complex scenarios where the "Entity" and "Server Name" columns are missing from an uploaded file. It uses a fallback mechanism to enrich the data, first by trying to extract the entity from the server name and then by using a mapping file.
+- **Global Analysis View:**
+    - A "Global Analysis" button provides a high-level, aggregated view of all servers combined.
+    - This view includes a summary pie chart for all IP reputations and a comprehensive data table.
+    - The table in the global view includes a "Server" column to easily identify the origin of each IP address.
 
 ## Style and Design
 
@@ -81,8 +85,13 @@ This application provides a focused solution for analyzing IP reputation scores 
 - **Interactive Chart:** The pie chart now filters the table when a segment is clicked.
 - **Enhanced Table:** The table now includes a dropdown to filter by reputation score and highlights blacklisted IPs in red.
 
-### Step 11: Data Enrichment and Code Quality (Current)
+### Step 11: Data Enrichment and Code Quality (Completed)
 
 - **Enhanced Data Enrichment:** The application can now handle more complex scenarios where the "Entity" and "Server Name" columns are missing from an uploaded file.
 - **Improved Code Quality:** Fixed all linting issues, including `no-prototype-builtins`, `react/prop-types`, `no-unused-vars`, and `react/react-in-jsx-scope`.
 - **Modern ESLint Configuration:** Updated the ESLint configuration to a modern, flat configuration.
+
+### Step 12: Global Analysis View (Current)
+
+- Added a "Global Analysis" button and view to provide an aggregated analysis of all servers.
+- This includes a global pie chart and an updated table that shows which server an IP belongs to in this view.

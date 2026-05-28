@@ -4,6 +4,7 @@ import Header from './components/Header';
 import FileUpload from './components/FileUpload';
 import Dashboard from './components/Dashboard';
 import CountryView from './components/CountryView';
+import IpView from './components/IpView';
 import {
   Container,
   Select,
@@ -27,7 +28,7 @@ function App() {
   const [servers, setServers] = useState([]);
   const [selectedEntity, setSelectedEntity] = useState('');
   const [selectedServers, setSelectedServers] = useState([]);
-  const [activeView, setActiveView] = useState('server'); // 'server' or 'country'
+  const [activeView, setActiveView] = useState(null);
 
   useEffect(() => {
     if (data.length > 0) {
@@ -48,10 +49,12 @@ function App() {
           return acc;
         }, []);
       setServers(entityServers);
-      setSelectedServers([]); // Reset server selection when entity changes
+      setSelectedServers([]);
+      setActiveView(null);
     } else {
       setServers([]);
       setSelectedServers([]);
+      setActiveView(null);
     }
   }, [selectedEntity, data]);
 
@@ -79,7 +82,6 @@ function App() {
 
     Promise.all(promises).then(allFilesData => {
         let entityMap = {};
-        // First pass: create entity map from files that have both server and entity
         allFilesData.forEach(jsonData => {
             if (jsonData.length > 0) {
                 const hasServer = Object.prototype.hasOwnProperty.call(jsonData[0], 'server') || Object.prototype.hasOwnProperty.call(jsonData[0], 'Server Name');
@@ -95,7 +97,6 @@ function App() {
             }
         });
 
-        // Second pass: process all files and enrich data
         allFilesData.forEach((jsonData, index) => {
             if (jsonData.length > 0) {
                 const hasEntity = Object.prototype.hasOwnProperty.call(jsonData[0], 'Entity');
@@ -103,14 +104,12 @@ function App() {
                     jsonData.forEach(row => {
                         const serverName = row['server'] || row['Server Name'];
                         if (serverName) {
-                            // Try to extract from server name first
                             if (typeof serverName === 'string') {
                                 const parts = serverName.split('_');
                                 if (parts.length > 1) {
                                     row['Entity'] = parts[1];
                                 }
                             }
-                            // If not found, use the entity map
                             if (!row['Entity'] && entityMap[serverName]) {
                                 row['Entity'] = entityMap[serverName];
                             }
@@ -129,7 +128,6 @@ function App() {
         setData(allData);
     }).catch(error => {
         console.error("Error processing files:", error);
-        // Handle error state in UI if necessary
     });
 };
 
@@ -140,25 +138,25 @@ function App() {
     setServers([]);
     setSelectedEntity('');
     setSelectedServers([]);
+    setActiveView(null);
   };
 
   const handleServerChange = (event) => {
-    const { value } = event.target;
+    const {
+      target: { value },
+    } = event;
     if (value.includes('all')) {
       setSelectedServers(servers.length === selectedServers.length ? [] : servers.map(s => s.name));
     } else {
-      setSelectedServers(value);
+      setSelectedServers(typeof value === 'string' ? value.split(',') : value);
     }
   };
 
-  const filteredData = data.filter((item) => {
-    const entityMatch = !selectedEntity || item['Entity'] === selectedEntity;
-    const serverMatch = 
-        selectedServers.length === 0 || 
-        selectedServers.includes(item['server'] || item['Server Name']);
-    
-    return entityMatch && serverMatch;
-  });
+  const entityFilteredData = data.filter((item) => item['Entity'] === selectedEntity);
+
+  const serverFilteredData = selectedServers.length > 0 
+    ? entityFilteredData.filter(row => selectedServers.includes(row.server || row['Server Name']))
+    : [];
 
   return (
     <>
@@ -185,7 +183,7 @@ function App() {
                                 onChange={(e) => setSelectedEntity(e.target.value)}
                                 >
                                 <MenuItem value="">
-                                    <em>All</em>
+                                    <em>None</em>
                                 </MenuItem>
                                 {entities.map((entity) => (
                                     <MenuItem key={entity} value={entity}>
@@ -217,8 +215,10 @@ function App() {
                         </Box>
                         <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
                             <ButtonGroup variant="outlined" aria-label="analysis type">
-                                <Button onClick={() => setActiveView('server')} variant={activeView === 'server' ? 'contained' : 'outlined'}>Server Analysis</Button>
-                                <Button onClick={() => setActiveView('country')} variant={activeView === 'country' ? 'contained' : 'outlined'}>Country-Level Analysis</Button>
+                                <Button onClick={() => setActiveView('entity')} variant={activeView === 'entity' ? 'contained' : 'outlined'} disabled={!selectedEntity}>Entity Analysis</Button>
+                                <Button onClick={() => setActiveView('server')} variant={activeView === 'server' ? 'contained' : 'outlined'} disabled={!selectedServers.length}>Server Analysis</Button>
+                                <Button onClick={() => setActiveView('country')} variant={activeView === 'country' ? 'contained' : 'outlined'} disabled={!selectedEntity}>Country-Level Analysis</Button>
+                                <Button onClick={() => setActiveView('ip')} variant={activeView === 'ip' ? 'contained' : 'outlined'} disabled={!data.length}>IP Analysis</Button>
                             </ButtonGroup>
                         </Box>
                     </Box>
@@ -228,13 +228,26 @@ function App() {
             </Paper>
           </Grid>
 
-          {selectedServers.length > 0 && (
+          {activeView && (
             <Grid item xs={12}>
-                {activeView === 'server' ? (
-                    <Dashboard data={filteredData} />
-                ) : (
-                    <CountryView data={filteredData} />
-                )}
+                {activeView === 'country' ? (
+                    <CountryView data={entityFilteredData} />
+                ) : activeView === 'entity' ? (
+                    <Dashboard 
+                        data={entityFilteredData} 
+                        entityName={selectedEntity}
+                        viewType={'entity'}
+                    />
+                ) : activeView === 'server' ? (
+                    <Dashboard 
+                        data={serverFilteredData}
+                        entityName={selectedEntity}
+                        selectedServerNames={selectedServers}
+                        viewType={'server'}
+                    />
+                ) : activeView === 'ip' ? (
+                    <IpView data={data} />
+                ) : null}
             </Grid>
           )}
         </Grid>
